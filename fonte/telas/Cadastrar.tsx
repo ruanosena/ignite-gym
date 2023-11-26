@@ -3,12 +3,25 @@ import LogotipoSvg from "@assets/logo.svg";
 import FundoImg from "@assets/background.png";
 import Entrada from "@comp/Entrada";
 import Botao from "@comp/Botao";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Cadastrar() {
+	const navegacao = useNavigation();
+
+	function lidarVoltar() {
+		navegacao.goBack();
+	}
+
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-			<VStack flex={1} bg="gray.700" px={10} pb={16}>
-				<Image source={FundoImg} alt="Pessoas treinando" resizeMode="contain" position="absolute" />
+			<VStack flex={1} px={10} pb={16}>
+				<Image
+					source={FundoImg}
+					defaultSource={FundoImg}
+					alt="Pessoas treinando"
+					resizeMode="contain"
+					position="absolute"
+				/>
 
 				<Center my={24}>
 					<LogotipoSvg />
@@ -29,7 +42,7 @@ export default function Cadastrar() {
 					<Botao>Criar e acessar</Botao>
 				</Center>
 
-				<Botao variant="outline" mt={24}>
+				<Botao variant="outline" mt={24} onPress={lidarVoltar}>
 					Voltar para o login
 				</Botao>
 			</VStack>

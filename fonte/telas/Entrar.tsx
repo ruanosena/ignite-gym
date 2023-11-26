@@ -3,12 +3,26 @@ import LogotipoSvg from "@assets/logo.svg";
 import FundoImg from "@assets/background.png";
 import Entrada from "@comp/Entrada";
 import Botao from "@comp/Botao";
+import { useNavigation } from "@react-navigation/native";
+import { AutNavegadorRotasProps } from "@rotas/aut.rotas";
 
 export default function Entrar() {
+	const navegacao = useNavigation<AutNavegadorRotasProps>();
+
+	function lidarNovaConta() {
+		navegacao.navigate("cadastrar");
+	}
+
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-			<VStack flex={1} bg="gray.700" px={10} pb={16}>
-				<Image source={FundoImg} alt="Pessoas treinando" resizeMode="contain" position="absolute" />
+			<VStack flex={1} px={10} pb={16}>
+				<Image
+					source={FundoImg}
+					defaultSource={FundoImg}
+					alt="Pessoas treinando"
+					resizeMode="contain"
+					position="absolute"
+				/>
 
 				<Center my={24}>
 					<LogotipoSvg />
@@ -32,7 +46,9 @@ export default function Entrar() {
 					<Text color="gray.100" fontSize="sm" mb={3} fontFamily="body">
 						Ainda não tem acesso?
 					</Text>
-					<Botao variant="outline">Criar conta</Botao>
+					<Botao variant="outline" onPress={lidarNovaConta}>
+						Criar conta
+					</Botao>
 				</Center>
 			</VStack>
 		</ScrollView>

@@ -3,8 +3,7 @@ import { useFonts, Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/
 import { NativeBaseProvider } from "native-base";
 import Carregamento from "@comp/Carregamento";
 import { TEMA } from "./fonte/tema";
-import Entrar from "@tela/Entrar";
-import Cadastrar from "@tela/Cadastrar";
+import Rotas from "@rotas/index";
 
 export default function App() {
 	const [fonteJaCarregada] = useFonts({ Roboto_400Regular, Roboto_700Bold });
@@ -12,7 +11,7 @@ export default function App() {
 	return (
 		<NativeBaseProvider theme={TEMA}>
 			<StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-			{fonteJaCarregada ? <Cadastrar /> : <Carregamento />}
+			{fonteJaCarregada ? <Rotas /> : <Carregamento />}
 		</NativeBaseProvider>
 	);
 }
