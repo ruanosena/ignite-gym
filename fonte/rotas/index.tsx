@@ -1,6 +1,7 @@
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import AutRotas from "./aut.rotas";
 import { Box, useTheme } from "native-base";
+import AppRotas from "./app.rotas";
 
 export default function Rotas() {
 	const { colors: cores } = useTheme();
@@ -11,7 +12,7 @@ export default function Rotas() {
 	return (
 		<Box flex={1} bg="gray.700">
 			<NavigationContainer theme={tema}>
-				<AutRotas />
+				<AppRotas />
 			</NavigationContainer>
 		</Box>
 	);
