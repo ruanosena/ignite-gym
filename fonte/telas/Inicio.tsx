@@ -1,9 +1,60 @@
-import { Center, Text } from "native-base";
+import ExercicioCartao from "@comp/ExercicioCartao";
+import Grupo from "@comp/Grupo";
+import InicioCabecalho from "@comp/InicioCabecalho";
+import { Center, HStack, Text, VStack, FlatList, Heading } from "native-base";
+import { useState } from "react";
 
 export default function Inicio() {
+	const [exercicios, defExercicios] = useState([
+		"Puxada frontal",
+		"Remada curvada",
+		"Remada unilateral",
+		"Levantamento terras",
+	]);
+	const [grupos, defGrupos] = useState(["Costas", "Biceps", "Triceps", "Ombro"]);
+	const [grupoSelecionado, defGrupoSelecionado] = useState("Costas");
+
 	return (
-		<Center flex={1}>
-			<Text color="white">Início</Text>
-		</Center>
+		<VStack flex={1}>
+			<InicioCabecalho />
+
+			<FlatList
+				data={grupos}
+				keyExtractor={(item) => item}
+				renderItem={({ item }) => (
+					<Grupo
+						estaAtivo={grupoSelecionado.toLowerCase() == item.toLowerCase()}
+						onPress={() => defGrupoSelecionado(item)}
+					>
+						{item}
+					</Grupo>
+				)}
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				_contentContainerStyle={{ px: 8 }}
+				my={10}
+				maxH={10}
+			/>
+
+			<VStack px={8} flex={1}>
+				<HStack justifyContent="space-between" mb={5}>
+					<Heading color="gray.200" fontSize="md">
+						Exercícios
+					</Heading>
+
+					<Text color="gray.200" fontSize="sm">
+						{exercicios.length}
+					</Text>
+				</HStack>
+
+				<FlatList
+					data={exercicios}
+					keyExtractor={(item) => item}
+					renderItem={({ item }) => <ExercicioCartao />}
+					showsVerticalScrollIndicator={false}
+					_contentContainerStyle={{ pb: 20 }}
+				/>
+			</VStack>
+		</VStack>
 	);
 }
