@@ -2,7 +2,7 @@ import { Button, IButtonProps, Text } from "native-base";
 import { ReactNode } from "react";
 
 type BotaoProps = IButtonProps & {
-	children: ReactNode;
+	children?: ReactNode;
 	variant?: "solid" | "outline";
 };
 
