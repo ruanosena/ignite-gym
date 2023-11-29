@@ -15,7 +15,7 @@ export default function ExercicioCartao({ ...rest }: ExercicioCartaoProps) {
 					h={16}
 					rounded="md"
 					mr={4}
-          resizeMode="center"
+          resizeMode="cover"
 				/>
 				<VStack flex={1}>
 					<Heading fontSize="lg" color="white">
