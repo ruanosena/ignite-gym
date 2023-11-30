@@ -12,7 +12,7 @@ export default function Rotas() {
 	return (
 		<Box flex={1} bg="gray.700">
 			<NavigationContainer theme={tema}>
-				<AppRotas />
+				<AutRotas />
 			</NavigationContainer>
 		</Box>
 	);

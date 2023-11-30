@@ -74,7 +74,7 @@ export default function Perfil() {
 					<Entrada placeholder="Nome" bg="gray.600" />
 					<Entrada placeholder="E-mail" isDisabled bg="gray.600" _disabled={{ bg: "gray.800" }} />
 
-					<Heading mt={12} mb={2} color="gray.200" fontSize="md" alignSelf="flex-start">
+					<Heading fontFamily="heading" mt={12} mb={2} color="gray.200" fontSize="md" alignSelf="flex-start">
 						Alterar senha
 					</Heading>
 

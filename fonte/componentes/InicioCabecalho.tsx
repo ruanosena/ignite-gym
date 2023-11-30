@@ -16,7 +16,7 @@ export default function InicioCabecalho() {
 				<Text color="gray.100" fontSize="md">
 					Olá,
 				</Text>
-				<Heading color="gray.100" fontSize="md">
+				<Heading color="gray.100" fontSize="md" fontFamily="heading">
 					Ruan
 				</Heading>
 			</VStack>
