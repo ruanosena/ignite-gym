@@ -5,12 +5,35 @@ import Entrada from "@comp/Entrada";
 import Botao from "@comp/Botao";
 import { useNavigation } from "@react-navigation/native";
 import { AutNavegadorRotasProps } from "@rotas/aut.rotas";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+type FormDadosProps = {
+	email: string;
+	senha: string;
+};
+
+const entrarEsquema = yup.object({
+	email: yup.string().required("Informe o e-mail").email("E-mail inválido"),
+	senha: yup.string().required("Informe a senha").min(6, "Senha inválida"),
+});
 
 export default function Entrar() {
 	const navegacao = useNavigation<AutNavegadorRotasProps>();
 
+	const {
+		control: controle,
+		handleSubmit: lidarEnviar,
+		formState: { errors: erros },
+	} = useForm<FormDadosProps>({ resolver: yupResolver(entrarEsquema) });
+
 	function lidarNovaConta() {
 		navegacao.navigate("cadastrar");
+	}
+
+	function lidarEntrar({ email, senha }: FormDadosProps) {
+		console.log({ email, senha });
 	}
 
 	return (
@@ -36,10 +59,37 @@ export default function Entrar() {
 						Acesse sua conta
 					</Heading>
 
-					<Entrada placeholder="E-mail" keyboardType="email-address" autoCapitalize="none" />
-					<Entrada placeholder="Senha" secureTextEntry />
+					<Controller
+						control={controle}
+						name="email"
+						render={({ field: { onChange, value } }) => (
+							<Entrada
+								onChangeText={onChange}
+								value={value}
+								placeholder="E-mail"
+								keyboardType="email-address"
+								autoCapitalize="none"
+								erroMensagem={erros.email?.message}
+							/>
+						)}
+					/>
+					<Controller
+						control={controle}
+						name="senha"
+						render={({ field: { onChange, value } }) => (
+							<Entrada
+								onChangeText={onChange}
+								value={value}
+								placeholder="Senha"
+								secureTextEntry
+								erroMensagem={erros.senha?.message}
+								onSubmitEditing={lidarEnviar(lidarEntrar)}
+								returnKeyType="send"
+							/>
+						)}
+					/>
 
-					<Botao>Acessar</Botao>
+					<Botao onPress={lidarEnviar(lidarEntrar)}>Acessar</Botao>
 				</Center>
 
 				<Center mt={24}>
