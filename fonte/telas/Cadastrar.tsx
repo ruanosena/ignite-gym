@@ -1,4 +1,4 @@
-import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast } from "native-base";
 import LogotipoSvg from "@assets/logo.svg";
 import FundoImg from "@assets/background.png";
 import Entrada from "@comp/Entrada";
@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { API } from "@servicos/api";
+import { AppErro } from "@util/AppErro";
 
 type FormDadosProps = {
 	nome: string;
@@ -27,6 +29,7 @@ const cadastroEsquema = yup.object({
 
 export default function Cadastrar() {
 	const navegacao = useNavigation();
+	const torrada = useToast();
 
 	const {
 		control: controle,
@@ -38,8 +41,22 @@ export default function Cadastrar() {
 		navegacao.goBack();
 	}
 
-	function lidarCadastro({ nome, email, senha, senhaConfirmacao }: FormDadosProps) {
-		console.log({ nome, email, senha, senhaConfirmacao });
+	async function lidarCadastro({ nome, email, senha }: FormDadosProps) {
+		try {
+			const resposta = await API.post("/users", { name: nome, email, password: senha });
+			console.log(resposta.data);
+		} catch (erro) {
+			let mensagem =
+				erro instanceof AppErro
+					? erro.message
+					: "Não foi possível criar a conta. Tente novamente mais tarde.";
+					
+			torrada.show({
+				title: mensagem,
+				placement: "top",
+				bgColor: "red.500",
+			});
+		}
 	}
 
 	return (
