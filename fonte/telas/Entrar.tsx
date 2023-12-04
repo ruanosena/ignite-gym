@@ -1,4 +1,4 @@
-import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast } from "native-base";
 import LogotipoSvg from "@assets/logo.svg";
 import FundoImg from "@assets/background.png";
 import Entrada from "@comp/Entrada";
@@ -6,34 +6,47 @@ import Botao from "@comp/Botao";
 import { useNavigation } from "@react-navigation/native";
 import { AutNavegadorRotasProps } from "@rotas/aut.rotas";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import useAut from "@hooks/useAut";
+import { AppErro } from "@util/AppErro";
+import { useState } from "react";
 
 type FormDadosProps = {
 	email: string;
 	senha: string;
 };
 
-const entrarEsquema = yup.object({
-	email: yup.string().required("Informe o e-mail").email("E-mail inválido"),
-	senha: yup.string().required("Informe a senha").min(6, "Senha inválida"),
-});
-
 export default function Entrar() {
+	const [estaCarregando, defEstaCarregando] = useState(false);
 	const navegacao = useNavigation<AutNavegadorRotasProps>();
+	const { entrar } = useAut();
+	const torrada = useToast();
 
 	const {
 		control: controle,
 		handleSubmit: lidarEnviar,
 		formState: { errors: erros },
-	} = useForm<FormDadosProps>({ resolver: yupResolver(entrarEsquema) });
+	} = useForm<FormDadosProps>();
 
 	function lidarNovaConta() {
 		navegacao.navigate("cadastrar");
 	}
 
-	function lidarEntrar({ email, senha }: FormDadosProps) {
-		console.log({ email, senha });
+	async function lidarEntrar({ email, senha }: FormDadosProps) {
+		try {
+			defEstaCarregando(true);
+			await entrar(email, senha);
+		} catch (erro) {
+			let mensagem =
+				erro instanceof AppErro ? erro.message : "Não foi possível entrar. Tente novamente mais tarde";
+
+			defEstaCarregando(false);
+
+			torrada.show({
+				title: mensagem,
+				placement: "top",
+				bgColor: "red.500",
+			});
+		}
 	}
 
 	return (
@@ -62,6 +75,7 @@ export default function Entrar() {
 					<Controller
 						control={controle}
 						name="email"
+						rules={{ required: "Informe o e-mail" }}
 						render={({ field: { onChange, value } }) => (
 							<Entrada
 								onChangeText={onChange}
@@ -76,6 +90,7 @@ export default function Entrar() {
 					<Controller
 						control={controle}
 						name="senha"
+						rules={{ required: "Informe a senha" }}
 						render={({ field: { onChange, value } }) => (
 							<Entrada
 								onChangeText={onChange}
@@ -89,7 +104,9 @@ export default function Entrar() {
 						)}
 					/>
 
-					<Botao onPress={lidarEnviar(lidarEntrar)}>Acessar</Botao>
+					<Botao isLoading={estaCarregando} onPress={lidarEnviar(lidarEntrar)}>
+						Acessar
+					</Botao>
 				</Center>
 
 				<Center mt={24}>

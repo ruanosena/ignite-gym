@@ -4,7 +4,7 @@
 		"strict": true,
 		"baseUrl": "./",
 		"paths": {
-			"@dtos/*": ["fonte/dtos/*"],
+			"@dtos/*": ["./fonte/dtos/*"],
 			"@assets/*": ["./fonte/assets/*"],
 			"@comp/*": ["./fonte/componentes/*"],
 			"@tela/*": ["./fonte/telas/*"],

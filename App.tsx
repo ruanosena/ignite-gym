@@ -4,6 +4,7 @@ import { NativeBaseProvider } from "native-base";
 import Carregamento from "@comp/Carregamento";
 import { TEMA } from "./fonte/tema";
 import Rotas from "@rotas/index";
+import AutContextoProvider, { AutContexto } from "@contextos/AutContexto";
 
 export default function App() {
 	const [fonteJaCarregada] = useFonts({ Roboto_400Regular, Roboto_700Bold });
@@ -11,7 +12,7 @@ export default function App() {
 	return (
 		<NativeBaseProvider theme={TEMA}>
 			<StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-			{fonteJaCarregada ? <Rotas /> : <Carregamento />}
+			<AutContextoProvider>{fonteJaCarregada ? <Rotas /> : <Carregamento />}</AutContextoProvider>
 		</NativeBaseProvider>
 	);
 }

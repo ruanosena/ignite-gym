@@ -9,6 +9,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { API } from "@servicos/api";
 import { AppErro } from "@util/AppErro";
+import { useState } from "react";
+import useAut from "@hooks/useAut";
 
 type FormDadosProps = {
 	nome: string;
@@ -28,8 +30,10 @@ const cadastroEsquema = yup.object({
 });
 
 export default function Cadastrar() {
+	const [estaCarregando, defEstaCarregando] = useState(false);
 	const navegacao = useNavigation();
 	const torrada = useToast();
+	const { entrar } = useAut();
 
 	const {
 		control: controle,
@@ -43,14 +47,17 @@ export default function Cadastrar() {
 
 	async function lidarCadastro({ nome, email, senha }: FormDadosProps) {
 		try {
-			const resposta = await API.post("/users", { name: nome, email, password: senha });
-			console.log(resposta.data);
+			defEstaCarregando(true);
+
+			await API.post("/users", { name: nome, email, password: senha });
+			await entrar(email, senha);
 		} catch (erro) {
+			defEstaCarregando(false);
 			let mensagem =
 				erro instanceof AppErro
 					? erro.message
 					: "Não foi possível criar a conta. Tente novamente mais tarde.";
-					
+
 			torrada.show({
 				title: mensagem,
 				placement: "top",
@@ -138,7 +145,9 @@ export default function Cadastrar() {
 							/>
 						)}
 					/>
-					<Botao onPress={lidarEnvio(lidarCadastro)}>Criar e acessar</Botao>
+					<Botao onPress={lidarEnvio(lidarCadastro)} isLoading={estaCarregando}>
+						Criar e acessar
+					</Botao>
 				</Center>
 
 				<Botao variant="outline" mt={12} onPress={lidarVoltar}>
