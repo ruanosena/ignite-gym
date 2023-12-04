@@ -1,26 +1,63 @@
+import Carregamento from "@comp/Carregamento";
 import ExercicioCartao from "@comp/ExercicioCartao";
 import Grupo from "@comp/Grupo";
 import InicioCabecalho from "@comp/InicioCabecalho";
-import { useNavigation } from "@react-navigation/native";
+import { ExercicioDTO } from "@dtos/exercicioDTO";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavegadorRotasProps } from "@rotas/app.rotas";
-import { Center, HStack, Text, VStack, FlatList, Heading } from "native-base";
-import { useState } from "react";
+import { API } from "@servicos/api";
+import { AppErro } from "@util/AppErro";
+import { Center, HStack, Text, VStack, FlatList, Heading, useToast } from "native-base";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Inicio() {
-	const [exercicios, defExercicios] = useState([
-		"Puxada frontal",
-		"Remada curvada",
-		"Remada unilateral",
-		"Levantamento terras",
-	]);
-	const [grupos, defGrupos] = useState(["Costas", "Biceps", "Triceps", "Ombro"]);
-	const [grupoSelecionado, defGrupoSelecionado] = useState("Costas");
+	const [estaCarregando, defEstaCarregando] = useState(true);
+	const [exercicios, defExercicios] = useState<ExercicioDTO[]>([]);
+	const [grupos, defGrupos] = useState<string[]>([]);
+	const [grupoSelecionado, defGrupoSelecionado] = useState("antebraço");
 
 	const navegacao = useNavigation<AppNavegadorRotasProps>();
+	const torrada = useToast();
 
-	function lidarAbrirDetalhesExercicio() {
-		navegacao.navigate("exercicio");
+	function lidarAbrirDetalhesExercicio(id: string) {
+		navegacao.navigate("exercicio", { id });
 	}
+
+	async function buscarGrupos() {
+		try {
+			const resposta = await API.get("/groups");
+			defGrupos(resposta.data);
+		} catch (erro) {
+			let mensagem =
+				erro instanceof AppErro ? erro.message : "Não foi possível carregar os grupos musculares";
+
+			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
+		}
+	}
+
+	async function buscarExerciciosPorGrupo() {
+		try {
+			defEstaCarregando(true);
+			const resposta = await API.get(`/exercises/bygroup/${grupoSelecionado}`);
+			defExercicios(resposta.data);
+		} catch (erro) {
+			let mensagem = erro instanceof AppErro ? erro.message : "Não foi possível carregar os exercícios";
+
+			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
+		} finally {
+			defEstaCarregando(false);
+		}
+	}
+
+	useEffect(() => {
+		buscarGrupos();
+	}, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			buscarExerciciosPorGrupo();
+		}, [grupoSelecionado])
+	);
 
 	return (
 		<VStack flex={1}>
@@ -45,25 +82,31 @@ export default function Inicio() {
 				minH={10}
 			/>
 
-			<VStack px={8} flex={1}>
-				<HStack justifyContent="space-between" mb={5}>
-					<Heading fontFamily="heading" color="gray.200" fontSize="md">
-						Exercícios
-					</Heading>
+			{estaCarregando ? (
+				<Carregamento />
+			) : (
+				<VStack px={8} flex={1}>
+					<HStack justifyContent="space-between" mb={5}>
+						<Heading fontFamily="heading" color="gray.200" fontSize="md">
+							Exercícios
+						</Heading>
 
-					<Text color="gray.200" fontSize="sm">
-						{exercicios.length}
-					</Text>
-				</HStack>
+						<Text color="gray.200" fontSize="sm">
+							{exercicios.length}
+						</Text>
+					</HStack>
 
-				<FlatList
-					data={exercicios}
-					keyExtractor={(item) => item}
-					renderItem={({ item }) => <ExercicioCartao onPress={lidarAbrirDetalhesExercicio} />}
-					showsVerticalScrollIndicator={false}
-					_contentContainerStyle={{ pb: 20 }}
-				/>
-			</VStack>
+					<FlatList
+						data={exercicios}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item }) => (
+							<ExercicioCartao dados={item} onPress={() => lidarAbrirDetalhesExercicio(item.id)} />
+						)}
+						showsVerticalScrollIndicator={false}
+						_contentContainerStyle={{ pb: 20 }}
+					/>
+				</VStack>
+			)}
 		</VStack>
 	);
 }

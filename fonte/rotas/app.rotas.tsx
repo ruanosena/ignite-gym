@@ -14,7 +14,7 @@ type AppRotas = {
 	inicio: undefined;
 	historico: undefined;
 	perfil: undefined;
-	exercicio: undefined;
+	exercicio: { id: string };
 };
 
 export type AppNavegadorRotasProps = BottomTabNavigationProp<AppRotas>;
