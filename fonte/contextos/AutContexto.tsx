@@ -2,6 +2,7 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import { UsuarioDTO } from "@dtos/usuarioDTO";
 import { API } from "@servicos/api";
 import { armObterUsuario, armRemoverUsuario, armSalvarUsuario } from "@arm/armUsuario";
+import { armObterAutToken, armRemoverAutToken, armSalvarAutToken } from "@arm/armAutToken";
 
 export type AutContextoDadosProps = {
 	usuario: UsuarioDTO;
@@ -20,12 +21,30 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 	const [usuario, defUsuario] = useState<UsuarioDTO>({} as UsuarioDTO);
 	const [estaCarregandoDados, defEstaCarregandoDados] = useState(true);
 
+	async function atualizarUsuarioEToken(usuarioDados: UsuarioDTO, token: string) {
+		API.defaults.headers.common.Authorization = `Bearer ${token}`;
+		defUsuario(usuarioDados);
+	}
+
+	async function salvarUsuarioEToken(usuarioDados: UsuarioDTO, token: string) {
+		try {
+			defEstaCarregandoDados(true);
+			await armSalvarUsuario(usuarioDados);
+			await armSalvarAutToken(token);
+		} catch (erro) {
+			throw erro;
+		} finally {
+			defEstaCarregandoDados(false);
+		}
+	}
+
 	async function entrar(email: string, senha: string) {
 		try {
 			const { data } = await API.post("/sessions", { email, password: senha });
-			if (data.user) {
-				defUsuario(data.user);
-				armSalvarUsuario(data.user);
+
+			if (data.user && data.token) {
+				await salvarUsuarioEToken(data.user, data.token);
+				atualizarUsuarioEToken(data.user, data.token);
 			}
 		} catch (erro) {
 			throw erro;
@@ -38,6 +57,7 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 			defUsuario({} as UsuarioDTO);
 
 			await armRemoverUsuario();
+			await armRemoverAutToken();
 		} catch (erro) {
 			throw erro;
 		} finally {
@@ -47,10 +67,12 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 
 	async function carregarDados() {
 		try {
+			defEstaCarregandoDados(true);
 			const usuarioAut = await armObterUsuario();
+			const token = await armObterAutToken();
 
-			if (usuarioAut.id) {
-				defUsuario(usuarioAut);
+			if (token && usuarioAut.id) {
+				atualizarUsuarioEToken(usuarioAut, token);
 			}
 		} catch (erro) {
 			throw erro;
@@ -69,7 +91,7 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 				usuario,
 				entrar,
 				estaCarregandoDados,
-				sair
+				sair,
 			}}
 		>
 			{children}
