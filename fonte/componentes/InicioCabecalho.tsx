@@ -5,6 +5,7 @@ import { TouchableOpacity } from "react-native";
 import useAut from "@hooks/useAut";
 
 import fotoPadraoUsuario from "@assets/userPhotoDefault.png";
+import { API } from "@servicos/api";
 
 export default function InicioCabecalho() {
 	const { usuario, sair } = useAut();
@@ -13,7 +14,9 @@ export default function InicioCabecalho() {
 		<HStack bg="gray.600" pt={16} pb={5} px={8} alignItems="center">
 			<UsuarioFoto
 				tamanho={16}
-				source={usuario.avatar ? { uri: usuario.avatar } : fotoPadraoUsuario}
+				source={
+					usuario.avatar ? { uri: `${API.defaults.baseURL}/avatar/${usuario.avatar}` } : fotoPadraoUsuario
+				}
 				alt="Imagem do usuário"
 				mr={4}
 			/>

@@ -8,6 +8,7 @@ export type AutContextoDadosProps = {
 	usuario: UsuarioDTO;
 	entrar: (email: string, senha: string) => Promise<void>;
 	estaCarregandoDados: boolean;
+	atualizar: (usuarioAtualizado: UsuarioDTO) => Promise<void>;
 	sair: () => Promise<void>;
 };
 
@@ -65,6 +66,15 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 		}
 	}
 
+	async function atualizar(usuarioAtualizado: UsuarioDTO) {
+		try {
+			defUsuario(usuarioAtualizado);
+			await armSalvarUsuario(usuarioAtualizado);
+		} catch (erro) {
+			throw erro;
+		}
+	}
+
 	async function carregarDados() {
 		try {
 			defEstaCarregandoDados(true);
@@ -91,6 +101,7 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 				usuario,
 				entrar,
 				estaCarregandoDados,
+				atualizar,
 				sair,
 			}}
 		>
