@@ -19,6 +19,7 @@ type RotaParamsProps = {
 };
 
 export default function Exercicio() {
+	const [enviandoRegistro, defEnviandoRegistro] = useState(false);
 	const [estaCarregando, defEstaCarregando] = useState(true);
 	const [exercicio, defExercicio] = useState<ExercicioDTO>({} as ExercicioDTO);
 	const navegacao = useNavigation<AppNavegadorRotasProps>();
@@ -43,6 +44,28 @@ export default function Exercicio() {
 			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
 		} finally {
 			defEstaCarregando(false);
+		}
+	}
+
+	async function lidarRegistrarHistoricoExercicio() {
+		try {
+			defEnviandoRegistro(true);
+
+			await API.post("/history", { exercise_id: id });
+
+			torrada.show({
+				title: "Parabéns! Exercício registrado no seu histórico",
+				placement: "top",
+				bgColor: "green.700",
+			});
+
+			navegacao.navigate("historico");
+		} catch (erro) {
+			let mensagem = erro instanceof AppErro ? erro.message : "Não foi possível registrar o exercício";
+
+			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
+		} finally {
+			defEnviandoRegistro(false);
 		}
 	}
 
@@ -100,7 +123,9 @@ export default function Exercicio() {
 								</HStack>
 							</HStack>
 
-							<Botao>Marcar como realizado</Botao>
+							<Botao isLoading={enviandoRegistro} onPress={lidarRegistrarHistoricoExercicio}>
+								Marcar como realizado
+							</Botao>
 						</Box>
 					</VStack>
 				</ScrollView>

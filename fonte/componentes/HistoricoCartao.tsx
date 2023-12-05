@@ -1,6 +1,11 @@
+import { HistoricoDTO } from "@dtos/historicoDTO";
 import { HStack, Heading, Text, VStack } from "native-base";
 
-export default function HistoricoCartao() {
+type Props = {
+	dados: HistoricoDTO;
+};
+
+export default function HistoricoCartao({ dados }: Props) {
 	return (
 		<HStack
 			w="full"
@@ -13,15 +18,21 @@ export default function HistoricoCartao() {
 			rounded="md"
 		>
 			<VStack mr={5} flex={1}>
-				<Heading color="white" fontSize="md" fontFamily="heading" textTransform="capitalize" numberOfLines={1}>
-					Costas
+				<Heading
+					color="white"
+					fontSize="md"
+					fontFamily="heading"
+					textTransform="capitalize"
+					numberOfLines={1}
+				>
+					{dados.group}
 				</Heading>
 				<Text color="gray.100" fontSize="lg" numberOfLines={1}>
-					Puxada frontal
+					{dados.name}
 				</Text>
 			</VStack>
 			<Text color="gray.300" fontSize="md">
-				08:56
+				{dados.hour}
 			</Text>
 		</HStack>
 	);
