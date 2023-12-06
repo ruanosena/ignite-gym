@@ -1,3 +1,4 @@
+import Carregamento from "@comp/Carregamento";
 import HistoricoCartao from "@comp/HistoricoCartao";
 import TelaCabecalho from "@comp/TelaCabecalho";
 import { HistoricoPorDiaDTO } from "@dtos/historicoPorDia";
@@ -37,25 +38,29 @@ export default function Historico() {
 		<VStack flex={1}>
 			<TelaCabecalho>Histórico de exercícios</TelaCabecalho>
 
-			<SectionList
-				sections={exercicios}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <HistoricoCartao dados={item} />}
-				renderSectionHeader={({ section }) => (
-					<Heading fontFamily="heading" color="gray.100" fontSize="md" mt={10} mb={3}>
-						{section.title}
-					</Heading>
-				)}
-				px={8}
-				contentContainerStyle={!exercicios.length && { flex: 1, justifyContent: "center" }}
-				ListEmptyComponent={() => (
-					<Text color="gray.100" textAlign="center">
-						Não há exercícios registrados ainda.{"\n"}
-						Pratique um exercício hoje mesmo!
-					</Text>
-				)}
-				showsVerticalScrollIndicator={false}
-			/>
+			{estaCarregando ? (
+				<Carregamento />
+			) : (
+				<SectionList
+					sections={exercicios}
+					keyExtractor={(item) => item.id}
+					renderItem={({ item }) => <HistoricoCartao dados={item} />}
+					renderSectionHeader={({ section }) => (
+						<Heading fontFamily="heading" color="gray.100" fontSize="md" mt={10} mb={3}>
+							{section.title}
+						</Heading>
+					)}
+					px={8}
+					contentContainerStyle={!exercicios.length && { flex: 1, justifyContent: "center" }}
+					ListEmptyComponent={() => (
+						<Text color="gray.100" textAlign="center">
+							Não há exercícios registrados ainda.{"\n"}
+							Pratique um exercício hoje mesmo!
+						</Text>
+					)}
+					showsVerticalScrollIndicator={false}
+				/>
+			)}
 		</VStack>
 	);
 }

@@ -27,11 +27,11 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 		defUsuario(usuarioDados);
 	}
 
-	async function salvarUsuarioEToken(usuarioDados: UsuarioDTO, token: string) {
+	async function salvarUsuarioEToken(usuarioDados: UsuarioDTO, token: string, token_atualizacao: string) {
 		try {
 			defEstaCarregandoDados(true);
 			await armSalvarUsuario(usuarioDados);
-			await armSalvarAutToken(token);
+			await armSalvarAutToken({ token, token_atualizacao });
 		} catch (erro) {
 			throw erro;
 		} finally {
@@ -43,8 +43,8 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 		try {
 			const { data } = await API.post("/sessions", { email, password: senha });
 
-			if (data.user && data.token) {
-				await salvarUsuarioEToken(data.user, data.token);
+			if (data.user && data.token && data.refresh_token) {
+				await salvarUsuarioEToken(data.user, data.token, data.refresh_token);
 				atualizarUsuarioEToken(data.user, data.token);
 			}
 		} catch (erro) {
@@ -79,7 +79,7 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 		try {
 			defEstaCarregandoDados(true);
 			const usuarioAut = await armObterUsuario();
-			const token = await armObterAutToken();
+			const { token } = await armObterAutToken();
 
 			if (token && usuarioAut.id) {
 				atualizarUsuarioEToken(usuarioAut, token);
@@ -94,6 +94,14 @@ export default function AutContextoProvider({ children }: AutContextoProviderPro
 	useEffect(() => {
 		carregarDados();
 	}, []);
+
+	useEffect(() => {
+		const inscrever = API.registrarInterceptadorToken(sair);
+
+		return () => {
+			inscrever();
+		};
+	}, [sair]);
 
 	return (
 		<AutContexto.Provider

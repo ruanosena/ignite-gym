@@ -1,13 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AUT_TOKEN_ARM } from "./armConfig";
 
-export async function armSalvarAutToken(token: string) {
-	await AsyncStorage.setItem(AUT_TOKEN_ARM, token);
+type ArmazenamentoTokenProps = {
+	token: string;
+	token_atualizacao: string;
+};
+
+export async function armSalvarAutToken({ token, token_atualizacao }: ArmazenamentoTokenProps) {
+	await AsyncStorage.setItem(AUT_TOKEN_ARM, JSON.stringify({ token, token_atualizacao }));
 }
 export async function armObterAutToken() {
-	let token = await AsyncStorage.getItem(AUT_TOKEN_ARM);
+	let resposta = await AsyncStorage.getItem(AUT_TOKEN_ARM);
 
-	return token;
+	const { token, token_atualizacao }: ArmazenamentoTokenProps = resposta ? JSON.parse(resposta) : {};
+
+	return { token, token_atualizacao };
 }
 
 export async function armRemoverAutToken() {
