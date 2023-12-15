@@ -13,6 +13,7 @@ import { API } from "@servicos/api";
 import { useEffect, useState } from "react";
 import { ExercicioDTO } from "@dtos/exercicioDTO";
 import Carregamento from "@comp/Carregamento";
+import { OneSignal } from "react-native-onesignal";
 
 type RotaParamsProps = {
 	id: string;
@@ -39,7 +40,9 @@ export default function Exercicio() {
 			defExercicio(resposta.data);
 		} catch (erro) {
 			let mensagem =
-				erro instanceof AppErro ? erro.message : "Não foi possível carregar os detalhes do exercício";
+				erro instanceof AppErro
+					? erro.message
+					: "Não foi possível carregar os detalhes do exercício";
 
 			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
 		} finally {
@@ -53,6 +56,7 @@ export default function Exercicio() {
 
 			await API.post("/history", { exercise_id: id });
 
+			OneSignal.User.addTag("ultimo_exercicio", Date.now().toString());
 			torrada.show({
 				title: "Parabéns! Exercício registrado no seu histórico",
 				placement: "top",
@@ -61,7 +65,8 @@ export default function Exercicio() {
 
 			navegacao.navigate("historico");
 		} catch (erro) {
-			let mensagem = erro instanceof AppErro ? erro.message : "Não foi possível registrar o exercício";
+			let mensagem =
+				erro instanceof AppErro ? erro.message : "Não foi possível registrar o exercício";
 
 			torrada.show({ title: mensagem, placement: "top", bgColor: "red.500" });
 		} finally {
